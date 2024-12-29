@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "just-another-rat-mini"
+version = "0.1.0"
+description = "Минимальный набор функций, необходимых для функционирования RAT-скрипта."
+authors = ["Олег <shuwiku@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+aiogram = "^3.15.0"
+loguru = "^0.7.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
