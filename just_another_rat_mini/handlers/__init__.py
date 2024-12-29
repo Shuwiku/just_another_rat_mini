@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
-"""Инструменты для настройки и получения обработчиков бота."""
+"""Функция регистрации обработчиков в диспетчере."""
 
 from aiogram.filters import Command, StateFilter
 from loguru import logger
 
 import bot
 from filters import IsAuthenticated
-from handlers import about, authenticate, download, execute, help_, upload
+from handlers import about, authorization, download, execute, help_, upload
 from states import GetInput
 
 
 def init() -> None:
-    """Настраивает обработчики бота."""
+    """Регистрирует обработчики в диспетчере."""
 
-    # /start
+    # /about
     bot.dispatcher.message.register(
         about.command_about,
         Command(commands=["about"]),
@@ -21,7 +21,7 @@ def init() -> None:
         IsAuthenticated()
     )
 
-    # /download файл
+    # /download file.txt
     bot.dispatcher.message.register(
         download.command_download,
         Command(commands=["download"]),
@@ -36,7 +36,7 @@ def init() -> None:
         IsAuthenticated()
     )
 
-    # /execute команда
+    # /execute command
     bot.dispatcher.message.register(
         execute.command_execute,
         Command(commands=["execute"]),
@@ -74,17 +74,26 @@ def init() -> None:
         IsAuthenticated()
     )
 
+    # /auth password
     bot.dispatcher.message.register(
-        authenticate.command_authenticate,
+        authorization.command_authorization,
         Command(commands=["auth"]),
         StateFilter(None),
         ~IsAuthenticated()
     )
 
+    # Любое сообщение до того, как администратор прошёл аутентификацию
     bot.dispatcher.message.register(
-        authenticate.message_authenticate,
+        authorization.message_authorization,
         StateFilter(None),
         ~IsAuthenticated()
     )
 
-    logger.trace("Обработчики настроены.")  # Логирование
+    # /auth
+    bot.dispatcher.message.register(
+        authorization.state_authorization,
+        StateFilter(GetInput.password),
+        ~IsAuthenticated()
+    )
+
+    logger.trace("Обработчики зарегистрированы.")  # Логирование
