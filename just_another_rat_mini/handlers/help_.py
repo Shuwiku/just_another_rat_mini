@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Выводит список команд с их кратким описанием."""
+"""Обработчик, выводящий список команд бота."""
 
 from aiogram.types import Message
 from loguru import logger
@@ -13,6 +13,7 @@ async def command_help(message: Message) -> None:
 
     # Выводит справку по команде
     if message.text == "/help /?":
+        logger.trace("Вывод справки по команде.")  # Логирование
         await message.answer(text=text.HELP_DOC)
         return None
 

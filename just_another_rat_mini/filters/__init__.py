@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
-"""DOCSTRING."""
+"""Фильтры aiogram для обработчиков бота."""
 
-from .is_authenticated import IsAuthenticated
+# Это позволяет импортировать классы напрямую из модуля
+# Вместо:   from filters.is_authenticated import IsAuthenticated
+# Будет:    from filters import IsAuthenticated
+from .is_authenticated import IsAuthenticated  # noqa: F401

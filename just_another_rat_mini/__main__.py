@@ -37,6 +37,7 @@ async def main() -> None:
     handlers.init()
 
     if config.NOTIFY_ON_STARTUP:
+        # Логирование
         logger.info("Отправляю сообщение администратору о запуске утилиты.")
         try:
             await bot.bot.send_message(
@@ -44,7 +45,7 @@ async def main() -> None:
                 text=text.NOTIFY_ON_STARTUP
             )
         except Exception as e:
-            logger.error(f"Не удалось отправить сообщение: {e}")
+            logger.error(f"Не удалось отправить сообщение: {e}")  # Логирование
 
     logger.info("Запуск диспетчера.")  # Логирование
 

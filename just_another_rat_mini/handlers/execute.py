@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-"""Выполняет переданную команду и отправляет результат её выполнения."""
+"""Обработчики, выполняющие переданную команду в терминале Windows."""
 
 import os
 import subprocess
 
-from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
+from aiogram.types import Message
 from loguru import logger
 
 import text
@@ -16,10 +16,18 @@ async def _execute(
     command: str,
     message: Message
 ) -> None:
-    """Выполняет переданную команду и отправляет результат её выполения."""
-    logger.debug("Функция:\t\t_execute")  # Логирование
+    """Выполняет переданную команду и отправляет результат её выполения.
 
-    logger.trace(f"Выполнение команды: '{command}'.")  # Логирование
+    Изменено поведение для команды "cd" (см. функцию _execute_cd).
+
+    Если при выполнении команды произошла ошибка (наример, такая команда не
+    существует) - уведомит администратора.
+
+    Если команда ничего не вернула - уведомит администратора.
+    """
+    logger.debug("Функция:\t\t_execute.")  # Логирование
+
+    logger.info(f"Выполнение команды: '{command}'.")  # Логирование
 
     # Иное поведение для команды "cd"
     if command == "cd" or command.startswith("cd "):
@@ -34,7 +42,7 @@ async def _execute(
             encoding="cp866"
         ).strip()
 
-        logger.trace("Команда успешно выполнена.")  # Логирование
+        logger.success("Команда успешно выполнена.")  # Логирование
 
         # Команда вернула результат своей работы
         if result:
@@ -58,8 +66,16 @@ async def _execute_cd(
     command: str,
     message: Message
 ) -> None:
-    """Выполняет команду "cd" и отправляет результат её выполения."""
-    logger.debug("Функция:\t\t_execute_cd")  # Логирование
+    """Выполняет команду "cd" и отправляет результат её выполения.
+
+    Если команда передана без аругментов ("cd") - выводит текущую директорию.
+    В противном случае пытается сменить рабочую директорию с помощью функции
+    os.chdir().
+
+    В случае возникновения исключений FileNotFoundError, NotADirectoryError или
+    PermissionError - уведомит администратора.
+    """
+    logger.debug("Функция:\t\t_execute_cd.")  # Логирование
 
     # Команда "cd" без аргументов
     if command == "cd":
@@ -77,7 +93,7 @@ async def _execute_cd(
         await message.answer(text=(text.EXECUTE_CD_2 % os.getcwd()))
 
         # Логирование
-        logger.info(f"Рабочая директория изменена на: '{os.getcwd()}'.")
+        logger.success(f"Рабочая директория изменена на: '{os.getcwd()}'.")
 
     # Указанной директории не существует
     except FileNotFoundError as e:
@@ -104,10 +120,10 @@ async def command_execute(
     message: Message,
     state: FSMContext
 ) -> None:
-    """Выполняет переданную команду и отправляет результат её выполения.
+    """Обрабатывает запрос администратора на выполнение команды.
 
-    Если команда не была передана - запускает машину состояний и запрашивает
-    ввод команды.
+    Если администратор сразу передал команду - вызывает функцию для выполнения.
+    В противном случае настраивает машину состояний на запрос команды.
     """
     logger.debug("Обработчик:\tcommand_execute.")  # Логирование
 
@@ -137,7 +153,7 @@ async def state_execute(
     message: Message,
     state: FSMContext
 ) -> None:
-    """Выполняет переданную команду и отправляет результат её выполения."""
+    """Отключает машину состояний и вызывает функцию выполнения команды."""
     logger.debug("Обработчик:\tstate_execute.")  # Логирование
 
     await state.clear()

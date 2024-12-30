@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Обработчик команды начала диалога с ботом."""
+"""Обработчик, выводящий информацию о утилите."""
 
 from aiogram.types import Message
 from loguru import logger
@@ -8,13 +8,13 @@ import text
 
 
 async def command_about(message: Message) -> None:
-    """Выводит приветственное сообщение."""
-    logger.debug("Обработчик:\tcommand_start")  # Логирование
+    """Выводит информацию о утилите."""
+    logger.debug("Обработчик:\tcommand_about.")  # Логирование
 
     # Выводит документацию по команде
     if message.text == "/about /?":
+        await message.answer(text=text.ABOUT_DOC)
         logger.trace("Вывод справки по команде.")  # Логирование
-        await message.answer(text=text.START_DOC)
         return None
 
-    await message.answer(text=text.START)
+    await message.answer(text=text.ABOUT)

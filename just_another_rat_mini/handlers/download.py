@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-"""Скачивает файл с устройства пользователя и отправляет администратору."""
+"""Обработчики загрузки файлов с устройства пользователя."""
 
 from pathlib import Path
 
 from aiogram.exceptions import TelegramNetworkError
-from aiogram.types import FSInputFile, Message
 from aiogram.fsm.context import FSMContext
+from aiogram.types import FSInputFile, Message
 from loguru import logger
 
 import bot
@@ -17,11 +17,11 @@ async def _download(
     file_name: str,
     message: Message
 ) -> None:
-    """Загружет указанный файл и отправляет администратору.
+    """Загружает указанный файл и отправляет его администратору.
 
-    Args:
-        file_name (str): Название или путь к файлу.
-        message (aiogram.types.Message): Сообщение aiogram.
+    В случае, если файл по указанному пути не существует или соединение
+    пользователя с Интернетом слишком слабое (такое, что не получается
+    отправить файл), уведомит об этом администратора.
     """
     logger.debug("Функция:\t\t_download.")  # Логирование
 
@@ -36,14 +36,14 @@ async def _download(
 
     # Временное сообщение
     await message.answer(text=text.DOWNLOAD_2)
-    logger.trace(f"Отправляю файл: '{file_path}'.")  # Логирование
+    logger.info(f"Отправляю файл: '{file_path}'.")  # Логирование
 
     try:  # Отправляет файл
         await message.answer_document(
             document=FSInputFile(path=file_path),
             caption=text.DOWNLOAD_3
         )
-        logger.info("Файл успешно отправлен администратору.")  # Логирование
+        logger.success("Файл успешно отправлен администратору.")  # Логирование
 
     # Время ожидания сервером передачи истекло
     except TelegramNetworkError as e:
@@ -66,7 +66,12 @@ async def command_download(
     message: Message,
     state: FSMContext
 ) -> None:
-    """Скачивает файл с устройства пользователя и отправляет администратору."""
+    """Обрабатывает запрос администратора на скачивание файла.
+
+    Если администратор сразу передал название или путь к файлу - вызывает
+    функцию загрузки. В противном случае настраивает машину состояний на
+    запрос названия файла.
+    """
     logger.debug("Обработчик:\tcommand_download.")  # Логирование
 
     # Выводит документацию по команде
@@ -95,7 +100,7 @@ async def state_download(
     message: Message,
     state: FSMContext
 ) -> None:
-    """Скачивает файл с устройства пользователя и отправляет администратору."""
+    """Отключает машину состояний и вызывает функцию загрузки."""
     logger.debug("Обработчик:\tstate_download.")  # Логирование
 
     await state.clear()

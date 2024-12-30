@@ -25,13 +25,15 @@ async def _authorization(
     if password == config.PASSWORD:
         await message.answer(text=text.AUTHORIZATION_2)
         await message.answer(text=text.ABOUT)
+
         config.authenticated.append(message.from_user.id)  # pyright: ignore
-        logger.info("Администратор прошёл авторизацию.")  # Логирование
+        logger.success("Администратор прошёл авторизацию.")  # Логирование
+
         return None
 
     # Пароли не совпали
     await message.answer(text=text.AUTHORIZATION_3)
-    logger.warning("Администратор не прошёл авторизацию!")  # Логирование
+    logger.warning("Администратор не прошёл авторизацию.")  # Логирование
 
 
 async def command_authorization(
@@ -47,8 +49,8 @@ async def command_authorization(
 
     # Выводит документацию по команде
     if message.text == "/auth /?":
-        logger.trace("Вывод справки по команде.")  # Логирование
         await message.answer(text=text.AUTHORIZATION_DOC)
+        logger.trace("Вывод справки по команде.")  # Логирование
         return None
 
     # Пароль для авторизации
